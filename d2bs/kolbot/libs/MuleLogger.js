@@ -105,9 +105,11 @@ var MuleLogger = {
 				color = items[i].getColor();
 				finalString += (this.getItemDesc(items[i]) + ";" + "0" + ";" + color + "\n");
 
-				if (this.SaveScreenShot) {
-					screenShot = items[i].itemType + this.getItemDesc(items[i]) + ";" + color;
-					sendCopyData(null, "D2Bot #", 0, "saveItem;" + screenShot);
+				if (this.SaveScreenShot &&
+						Controller.saveScreenShot !== undefined) {
+					screenShot = items[i].itemType +
+						this.getItemDesc(items[i]) + ";" + color;
+					Controller.saveScreenShot(screenShot);
 					delay(500);
 				}
 			}

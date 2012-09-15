@@ -44,7 +44,7 @@ function main() {
 
 			break;
 		case "mugshot": // Take a screenshot and log the kill
-			D2Bot.printToConsole(msg.split(" ")[1] + " has been neutralized.;4");
+			Controller.printToConsole(msg.split(" ")[1] + " has been neutralized.;4");
 			hideConsole();
 			delay(500);
 			takeScreenshot();
@@ -60,7 +60,7 @@ function main() {
 		if (party) {
 			do {
 				if (party.name !== me.name && getPlayerFlag(me.gid, party.gid, 8) && hostiles.indexOf(party.name) === -1) {
-					D2Bot.printToConsole(party.name + " (Level " + party.level + " " + charClass[party.classid] + ")" + " has declared hostility.;8");
+					Controller.printToConsole(party.name + " (Level " + party.level + " " + charClass[party.classid] + ")" + " has declared hostility.;8");
 					hostiles.push(party.name);
 				}
 			} while (party.getNext());

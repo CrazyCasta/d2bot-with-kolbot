@@ -63,29 +63,29 @@ var Gambling = {
 			return false;
 		}
 
-		function CheckEvent(mode, msg) {
+		function CheckEvent(msg) {
 			var i;
 
 			for (i = 0; i < Gambling.gambleGames.length; i += 1) {
-				if (msg.match(Gambling.gambleGames[i])) {
-					game = msg.split('/');
+				if (msg.msg.match(Gambling.gambleGames[i])) {
+					game = msg.msg.split('/');
 
 					break;
 				}
 			}
 
-			removeEventListener('copydata', CheckEvent);
+			Controller.removeMessageHandler(CheckEvent);
 
 			return true;
 		}
 
 		var i, game;
 
-		addEventListener('copydata', CheckEvent);
+		Controller.addMessageHandler(CheckEvent);
 		game = null;
 
 		for (i = 0; i < this.gamblers.length; i += 1) {
-			sendCopyData(null, this.gamblers[i], 0, me.profile);
+			Controller.sendMessage(this.gamblers[i], {id: 0, msg: me.profile});
 			delay(100);
 
 			if (game) {

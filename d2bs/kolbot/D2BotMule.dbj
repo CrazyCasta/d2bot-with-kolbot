@@ -9,7 +9,7 @@ var StarterConfig = {
 };
 
 
-var muler, mulerStatus, keyswap, connectFail, makeAcc, muleMode, muleFilename, muleInfoObj,
+var muler, mulerStatus, connectFail, makeAcc, muleMode, muleFilename, muleInfoObj,
 	makeNext = false,
 	status = "loading";
 
@@ -138,8 +138,8 @@ function pickItems() {
 				break;
 			}
 		} else {
-			sendCopyData(null, muler.toString(), 10, "report");
-			//D2Bot.shoutGlobal("report", 0);
+			Controller.sendMessage(muler.toString(), {id: 10, msg: "report"});
+			//Controller.sendMessageAll({msg: "report", id: 0});
 		}
 
 		delay(1000);
@@ -173,27 +173,16 @@ function getMuler(msg) {
 }
 
 // muler/mule communication function
-function ReceiveCopyData(mode, msg) {
+function HandleMsg(msg) {
 	// mode check instead of msg check because of crashes
-	switch (mode) {
-	case 1: // join
-		break;
-	case 2: // game info
-		print("Recieved Game Info");
-
-		keyswap = parseInt(msg.split('/')[4], 10);
-
-		break;
-	case 3: // request game
-		break;
-
+	switch (msg.id) {
 	// automule specific
 	case 10: // mule request
 		if (!muler) {
-			muler = getMuler(msg);
+			muler = getMuler(msg.msg);
 		} else {
-			sendCopyData(null, muler.toString(), 10, status);
-			//D2Bot.shoutGlobal(status, 0);
+			Controller.sendMessage(muler.toString(), {id: 10, msg: status});
+			//Controller.sendMessageAll({msg: status, id: 0});
 		}
 
 		break;
@@ -202,7 +191,7 @@ function ReceiveCopyData(mode, msg) {
 
 		break;
 	case 12: // get muler's status
-		mulerStatus = msg;
+		mulerStatus = msg.msg;
 
 		break;
 	}
@@ -268,13 +257,12 @@ function timeoutDelay(text, time) {
 	var endTime = getTickCount() + time;
 
 	while (getTickCount() < endTime) {
-		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+		Controller.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
 		delay(500);
 	}
 }
 
 function updateCount() {
-	D2Bot.updateCount();
 	delay(1000);
 	ControlAction.click(6, 264, 366, 272, 35);
 
@@ -335,11 +323,9 @@ include("common/config.js");
 include("common/prototypes.js");
 load("tools/heartbeat.js");
 
-addEventListener("copydata", ReceiveCopyData);
-
 function main() {
 	delay(rand(1, 2) * 1000);
-	D2Bot.requestGameInfo();
+	Controller.addMessageHandler(HandleMsg);
 
 	// Wait for muler before login = give room to determine muling mode (normal or torch)
 	while (!muler) {
@@ -366,7 +352,7 @@ function main() {
 	} catch (e) {
 		print("Caught exception creating data files.");
 		print(e);
-		D2Bot.printToConsole("Exception: " + e);
+		Controller.printToConsole("Exception: " + e);
 	}
 
 	while (true) {
@@ -375,8 +361,8 @@ function main() {
 				if (status === "loading") {
 					status = "ready";
 
-					D2Bot.updateStatus("In mule game.");
-					D2Bot.printToConsole("In mule game.");
+					Controller.updateStatus("In mule game.");
+					Controller.printToConsole("In mule game.");
 					Storage.Init();
 				}
 
@@ -385,8 +371,8 @@ function main() {
 				}
 
 				if (status !== "begin") {
-					D2Bot.printToConsole("Nobody joined - stopping.");
-					D2Bot.stop();
+					Controller.printToConsole("Nobody joined - stopping.");
+					Controller.stop();
 				}
 
 				me.overhead("begin");
@@ -394,8 +380,9 @@ function main() {
 				switch (pickItems()) {
 				// done picking, tell the muler to leave game and kill mule profile
 				case "done":
-					sendCopyData(null, muler.toString(), 10, "quit");
-					//D2Bot.shoutGlobal("quit", 0);
+					Controller.sendMessage(muler.toString(),
+						{id: 10, msg: "quit"});
+					//Controller.sendMessageAll({msg: "quit", id: 0});
 					MuleLogger.logChar();
 					delay(500);
 
@@ -406,8 +393,8 @@ function main() {
 					}
 
 					MuleData.write(obj);
-					D2Bot.printToConsole("Done muling.");
-					D2Bot.stop();
+					Controller.printToConsole("Done muling.");
+					Controller.stop();
 
 					break;
 				// can't fit more items, get to next character or account
@@ -425,7 +412,7 @@ function main() {
 					obj.fullChars.push(me.name);
 					MuleData.write(obj);
 					nextChar();
-					D2Bot.printToConsole("Mule full, getting next character.");
+					Controller.printToConsole("Mule full, getting next character.");
 					quit();
 
 					break;
@@ -440,7 +427,7 @@ function main() {
 		} catch (e2) {
 			print("Caught an exception in the main loop.");
 			print(e2);
-			D2Bot.printToConsole("Exception: " + e2);
+			Controller.printToConsole("Exception: " + e2);
 		}
 	}
 }
@@ -464,7 +451,7 @@ MainSwitch:
 
 		break;
 	case 4: // Create Game
-		D2Bot.updateStatus("Creating Game");
+		Controller.updateStatus("Creating Game");
 
 		control = getControl(1, 657, 342, 27, 20);
 
@@ -478,13 +465,13 @@ MainSwitch:
 
 		break;
 	case 2: // Waiting In Line
-		D2Bot.updateStatus("Waiting...");
+		Controller.updateStatus("Waiting...");
 		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
 		ControlAction.click(6, 433, 433, 96, 32);
 
 		break;
 	case 5: // Join Game
-		D2Bot.updateStatus("Join Game");
+		Controller.updateStatus("Join Game");
 		delay(2000);
 		joinGame(AutoMule.muleGameName[0], AutoMule.muleGameName[1]);
 		locationTimeout(5000, location);
@@ -517,7 +504,7 @@ MainSwitch:
 		if (makeAcc) {
 			ControlAction.makeAccount(info);
 			//FileTools.writeText("mules/" + info.account + ".txt", "");
-			D2Bot.printToConsole("Made account: " + info.account);
+			Controller.printToConsole("Made account: " + info.account);
 
 			makeAcc = false;
 
@@ -542,24 +529,24 @@ MainSwitch:
 
 			switch (string) {
 			case getLocaleString(5207):
-				D2Bot.updateStatus("Invalid Password");
-				D2Bot.printToConsole("Invalid Password");
+				Controller.updateStatus("Invalid Password");
+				Controller.printToConsole("Invalid Password");
 				break;
 			case getLocaleString(5199):
-				D2Bot.updateStatus("Disabled CDKey");
-				D2Bot.printToConsole("Disabled CDKey");
-				D2Bot.CDKeyDisabled();
+				Controller.updateStatus("Disabled CDKey");
+				Controller.printToConsole("Disabled CDKey");
+				Controller.report(ReportType.CDKeyDisabled);
 
-				if (keyswap) {
-					D2Bot.restart(true);
+				if (Controller.keyswap) {
+					Controller.restart();
 				} else {
-					D2Bot.stop();
+					Controller.stop();
 				}
 
 				break;
 			case getLocaleString(5347):
-				D2Bot.updateStatus("Disconnected");
-				D2Bot.printToConsole("Disconnected");
+				Controller.updateStatus("Disconnected");
+				Controller.printToConsole("Disconnected");
 				ControlAction.click(6, 335, 412, 128, 35);
 
 				break MainSwitch;
@@ -570,8 +557,8 @@ MainSwitch:
 
 				break MainSwitch;
 			default:
-				D2Bot.updateStatus("Login Error");
-				D2Bot.printToConsole("Login Error - " + string);
+				Controller.updateStatus("Login Error");
+				Controller.printToConsole("Login Error - " + string);
 				break;
 			}
 		}
@@ -584,7 +571,7 @@ MainSwitch:
 
 		break;
 	case 11: // Unable To Connect
-		D2Bot.updateStatus("Unable To Connect");
+		Controller.updateStatus("Unable To Connect");
 
 		if (connectFail) {
 			timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 6e4);
@@ -600,7 +587,7 @@ MainSwitch:
 
 		break;
 	case 13: // Realm Down - Character Select screen
-		D2Bot.updateStatus("Realm Down");
+		Controller.updateStatus("Realm Down");
 		delay(1000);
 
 		if (!ControlAction.click(6, 33, 572, 128, 35)) {
@@ -609,19 +596,19 @@ MainSwitch:
 
 		updateCount();
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
-		D2Bot.CDKeyRD();
+		Controller.report(ReportType.RealmDown);
 
-		if (keyswap) {
-			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+		if (Controller.keyswap) {
+			Controller.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
+			Controller.restart();
 		} else {
-			D2Bot.restart();
+			Controller.restart();
 		}
 
 		break;
 	case 14: // Character Select / Main Menu - Disconnected
-		D2Bot.updateStatus("Disconnected");
+		Controller.updateStatus("Disconnected");
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
 
@@ -686,7 +673,7 @@ MainSwitch:
 			}
 
 			//FileTools.appendText("mules/" + info.account + ".txt", info.charName + "\n");
-			D2Bot.printToConsole("Made character: " + info.charName);
+			Controller.printToConsole("Made character: " + info.charName);
 		}
 
 		break;
@@ -702,12 +689,12 @@ MainSwitch:
 
 		break;
 	case 19: // Login - Cdkey In Use
-		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
-		D2Bot.CDKeyInUse();
+		Controller.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+		Controller.report(ReportType.CDKeyInUse);
 
-		if (keyswap) {
+		if (Controller.keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
+			Controller.restart();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -723,10 +710,12 @@ MainSwitch:
 
 		break;
 	case 22: // Login - Invalid Cdkey (classic or xpac)
-		if (keyswap) {
-			D2Bot.printToConsole("Invalid CD-Key");
+		Controller.report(ReportType.CDKeyInvalid);
+
+		if (Controller.keyswap) {
+			Controller.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
+			Controller.restart();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);

@@ -104,7 +104,7 @@ function Wakka() {
 		if (glow) {
 			for (i = 0; i < 10; i += 1) {
 				if (me.getStat(12) >= stopLvl) {
-					D2Bot.stop();
+					Controller.stop();
 				}
 
 				boss = getUnit(1, name);
@@ -157,7 +157,7 @@ function Wakka() {
 
 		while (path.length > 0) {
 			if (me.getStat(12) >= stopLvl) {
-				D2Bot.stop();
+				Controller.stop();
 			}
 			
 			if (me.mode === 17 || me.inTown) {
@@ -229,7 +229,7 @@ function Wakka() {
 	if (AutoLeaderDetect(108)) {
 		while (Misc.inMyParty(leader)) {
 			if (me.getStat(12) >= stopLvl) {
-				D2Bot.stop();
+				Controller.stop();
 			}
 
 			switch (me.area) {

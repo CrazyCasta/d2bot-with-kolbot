@@ -21,7 +21,7 @@ function OrgTorch() {
 		if (item) {
 			do {
 				if (item.quality === 7 && Pickit.checkItem(item).result === 1) {
-					//D2Bot.printToConsole("torch found");
+					//Controller.printToConsole("torch found");
 					scriptBroadcast("muleTorch");
 
 					quit();
@@ -223,14 +223,16 @@ function OrgTorch() {
 	if (Config.OrgTorch.WaitForKeys) {
 		timer = getTickCount();
 
-		this.torchSystemEvent = function (mode, msg) {
-			if (mode === 0 && TorchSystem.KeyFinderProfiles.indexOf(msg) > -1) {
-				print("Got game request from: " + msg);
-				sendCopyData(null, msg, 0, me.gamename + "/" + me.gamepassword);
+		this.torchSystemEvent = function (msg) {
+			if (msg.id === 0 &&
+					TorchSystem.KeyFinderProfiles.indexOf(msg.msg) > -1) {
+				print("Got game request from: " + msg.msg);
+				Controller.sendMessage(msg.msg,
+						{id: 0, msg: me.gamename + "/" + me.gamepassword});
 			}
 		};
 
-		addEventListener('copydata', this.torchSystemEvent);
+		Controller.addMessageHandler(this.torchSystemEvent);
 		Town.goToTown(1);
 		Town.move("stash");
 
@@ -244,7 +246,7 @@ function OrgTorch() {
 			dkeys = me.findItems("pk3", 0).length;
 
 			if (((tkeys >= 3 && hkeys >= 3 && dkeys >= 3) || (Config.OrgTorch.WaitTimeout && (getTickCount() - timer > Config.OrgTorch.WaitTimeout * 1000 * 60))) && this.foreverAlone()) {
-				removeEventListener('copydata', this.torchSystemEvent);
+				Controller.removeMessageHandler(this.torchSystemEvent);
 
 				break;
 			}

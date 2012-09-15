@@ -295,14 +295,14 @@ function main() {
 			break;
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
 			if (configCache.SoJWaitTime) {
-				D2Bot.printToConsole(param1 + " Stones of Jordan Sold to Merchants;7");
+				Controller.printToConsole(param1 + " Stones of Jordan Sold to Merchants;7");
 				scriptBroadcast("soj");
 			}
 
 			break;
 		case 0x12: // "Diablo Walks the Earth"
 			if (configCache.StopOnDClone) {
-				D2Bot.printToConsole("Diablo Walks the Earth;7");
+				Controller.printToConsole("Diablo Walks the Earth;7");
 				this.togglePause();
 				Town.goToTown();
 				showConsole();
@@ -349,8 +349,8 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					D2Bot.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + area.name + this.getNearestMonster() + ";9");
-					D2Bot.updateChickens();
+					Controller.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + area.name + this.getNearestMonster() + ";9");
+					Controller.report(ReportType.Chicken);
 
 					me.chickenhp = me.hpmax + 500; // Just to trigger the core chicken
 					//quit();
@@ -373,8 +373,8 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					D2Bot.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + area.name + ";9");
-					D2Bot.updateChickens();
+					Controller.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + area.name + ";9");
+					Controller.report(ReportType.Chicken);
 
 					me.chickenmp = me.mpmax + 500; // Just to trigger the core chicken
 					//quit();
@@ -395,8 +395,8 @@ function main() {
 								area = {name: "unknown"};
 							}
 
-							D2Bot.printToConsole("Irom Golem Chicken in " + area.name + ";9");
-							D2Bot.updateChickens();
+							Controller.printToConsole("Irom Golem Chicken in " + area.name + ";9");
+							Controller.report(ReportType.Chicken);
 							quit();
 
 							break;
@@ -415,8 +415,8 @@ function main() {
 								area = {name: "unknown"};
 							}
 
-							D2Bot.printToConsole("Merc Chicken in " + area.name + ";9");
-							D2Bot.updateChickens();
+							Controller.printToConsole("Merc Chicken in " + area.name + ";9");
+							Controller.report(ReportType.Chicken);
 							quit();
 
 							break;
@@ -430,7 +430,7 @@ function main() {
 					}
 				}
 			} catch (e) {
-				D2Bot.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");
+				Controller.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");
 				quit();
 
 				return;

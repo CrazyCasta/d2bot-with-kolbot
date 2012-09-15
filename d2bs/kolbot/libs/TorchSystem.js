@@ -59,7 +59,7 @@ var TorchSystem = {
 		}
 
 		if (me.getItem("pk1") && me.getItem("pk2") && me.getItem("pk3")) {
-			//D2Bot.printToConsole("We have enough keys.");
+			//Controller.printToConsole("We have enough keys.");
 
 			return true;
 		}
@@ -68,16 +68,16 @@ var TorchSystem = {
 	},
 
 	outOfGameCheck: function () {
-		//D2Bot.printToConsole("Trying to get in touch with Torch Farmers.");
+		//Controller.printToConsole("Trying to get in touch with Torch Farmers.");
 
 		var i, game;
 
-		function CheckEvent(mode, msg) {
+		function CheckEvent(msg) {
 			var i;
 
 			for (i = 0; i < TorchSystem.FarmGames.length; i += 1) {
-				if (msg.toLowerCase().match(TorchSystem.FarmGames[i].toLowerCase())) {
-					game = msg.split('/');
+				if (msg.msg.toLowerCase().match(TorchSystem.FarmGames[i].toLowerCase())) {
+					game = msg.msg.split('/');
 
 					break;
 				}
@@ -86,10 +86,11 @@ var TorchSystem = {
 			return true;
 		}
 
-		addEventListener('copydata', CheckEvent);
+		Controller.addMessageHandler(CheckEvent);
 
 		for (i = 0; i < this.FarmerProfiles.length; i += 1) {
-			sendCopyData(null, this.FarmerProfiles[i], 0, me.profile);
+			Controller.sendMessage(this.FarmerProfiles[i],
+					{id: 0, msg: me.profile});
 			delay(300);
 
 			if (game) {
@@ -97,10 +98,10 @@ var TorchSystem = {
 			}
 		}
 
-		removeEventListener('copydata', CheckEvent);
+		Controller.removeMessageHandler(CheckEvent);
 
 		if (game) {
-			D2Bot.printToConsole("Joining key drop game.");
+			Controller.printToConsole("Joining key drop game.");
 			delay(2000);
 			joinGame(game[0], game[1]);
 			delay(4000);

@@ -11,14 +11,16 @@ function Gamble() {
 	me.maxgametime = 0;
 	Town.goToTown(1);
 
-	addEventListener('copydata',
-		function (mode, msg) {
-			if (needGold && mode === 0 && Gambling.goldFinders.indexOf(msg) > -1) {
-				print("got game request from " + msg);
-				sendCopyData(null, msg, 4, me.gamename + "/" + me.gamepassword);
+	Controller.addMessageHandler(
+		function (msg) {
+			if (needGold && msg.id === 0 &&
+				Gambling.goldFinders.indexOf(msg.msg) > -1) {
+				print("got game request from " + msg.msg);
+				Controller.sendMessage(msg.msg,
+					{id: 4, msg: me.gamename + "/" + me.gamepassword});
 			}
 		}
-		);
+	);
 
 	while (true) {
 		if (Town.needGamble()) {

@@ -10,8 +10,6 @@ function main() {
 	include("json2.js");
 	include("OOG.js");
 	load("tools/heartbeat.js");
-	
-	addEventListener('copydata', RecieveCopyData);
 
 	if (!FileTools.exists("data/" + me.profile + ".json")) {
 		DataFile.create();
@@ -27,20 +25,5 @@ function main() {
 		}
 		
 		delay(1000);
-	}
-}
-
-function RecieveCopyData(msgID, msg){
-	switch(msgID) {
-	case D2BOT_GAMEINFO:
-		print("Recieved Game Info"); 
-		[gameName, gamePass, difficulty] = msg.split('/');
-		break;
-	case D2BOT_JOIN:
-		[nextGame, gamePass, isUp] = msg.split('/');
-		break;
-	case D2BOT_REQUESTGAME:
-		D2Bot.joinMe(msg, me.gamename, "", me.gamepassword, isUp); 
-		break;
 	}
 }

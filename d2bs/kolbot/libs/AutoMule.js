@@ -39,7 +39,7 @@ var AutoMule = {
 			return false;
 		}
 
-		D2Bot.printToConsole("In mule game.");
+		Controller.printToConsole("In mule game.");
 
 		var mode, muleInfoObj,
 			status = "muling";
@@ -61,10 +61,11 @@ var AutoMule = {
 			}
 		}
 
-		function DropStatusEvent(mode, msg) {
-			switch (msg) {
+		function DropStatusEvent(msg) {
+			switch (msg.msg) {
 			case "report": // reply to status request
-				sendCopyData(null, muleInfoObj.muleProfile, 12, status);
+				Controller.sendMessage(muleInfoObj.muleProfile,
+						{id: 12, msg: status});
 
 				break;
 			case "quit": // quit command
@@ -75,7 +76,7 @@ var AutoMule = {
 		}
 
 		print("ÿc4AutoMuleÿc0: In mule game.");
-		addEventListener("copydata", DropStatusEvent);
+		Controller.addMessageHandler(DropStatusEvent);
 		addEventListener("scriptmsg", CheckModeEvent);
 		scriptBroadcast("requestMuleMode");
 		delay(500);
@@ -85,7 +86,7 @@ var AutoMule = {
 			throw new Error("Failed to go to stash in act 1");
 		}
 
-		sendCopyData(null, muleInfoObj.muleProfile, 11, "begin");
+		Controller.sendMessage(muleInfoObj.muleProfile, {id: 11, msg: "begin"});
 
 		switch (mode) {
 		case 0:
@@ -113,7 +114,7 @@ var AutoMule = {
 			delay(500);
 		}
 
-		removeEventListener("copydata", DropStatusEvent);
+		Controller.removeMessageHandler(DropStatusEvent);
 		quit();
 		delay(10000);
 
@@ -125,28 +126,30 @@ var AutoMule = {
 		mode = mode || 0;
 
 		var status = "", muleInfoObj,
-			failCount = 0;
+			failCount = 0, finalMsg;
 
 		muleInfoObj = mode === 1 ? this.TorchMule : this.Mule;
 
-		function MuleCheckEvent(mode, msg) {
-			if (mode === 10) {
-				status = msg;
+		function MuleCheckEvent(msg) {
+			if (msg.id === 10) {
+				status = msg.msg;
 			}
 		}
 
-		addEventListener("copydata", MuleCheckEvent);
-		D2Bot.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleInfoObj.muleProfile);
-		D2Bot.start(muleInfoObj.muleProfile);
+		Controller.addMessageHandler(MuleCheckEvent);
+		Controller.printToConsole("Starting" + (mode === 1 ? " torch " : " ")  + "mule profile: " + muleInfoObj.muleProfile);
+		Controller.start(muleInfoObj.muleProfile);
 
 MainLoop:
 		while (true) {
-			sendCopyData(null, muleInfoObj.muleProfile, 10, me.profile.toString() + (mode === 1 ? "|torch" : ""));
+			finalMsg = me.profile.toString() + (mode === 1 ? "|torch" : "");
+			Controller.sendMessage(muleInfoObj.muleProfile,
+					{id: 10, msg: finalMsg});
 			delay(1000);
 
 			switch (status) {
 			case "begin":
-				D2Bot.printToConsole("Mule profile is busy");
+				Controller.printToConsole("Mule profile is busy");
 
 				break MainLoop;
 			case "ready":
@@ -158,7 +161,7 @@ MainLoop:
 				failCount += 1;
 
 				if (failCount >= 60) {
-					D2Bot.printToConsole("No response from mule profile.");
+					Controller.printToConsole("No response from mule profile.");
 
 					break MainLoop;
 				}
@@ -167,7 +170,7 @@ MainLoop:
 			}
 		}
 
-		removeEventListener("copydata", MuleCheckEvent);
+		Controller.removeMessageHandler(MuleCheckEvent);
 
 		while (me.ingame) {
 			delay(1000);

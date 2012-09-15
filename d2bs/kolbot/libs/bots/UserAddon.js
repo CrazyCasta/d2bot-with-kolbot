@@ -17,9 +17,9 @@ function UserAddon() {
 		switch (key) {
 		case 32:
 			FileTools.copy("libs/config/" + classes[me.classid] + ".js", "libs/config/" + classes[me.classid] + "." + me.name + ".js");
-			D2Bot.printToConsole("libs/config/" + classes[me.classid] + "." + me.name + ".js has been created.");
-			D2Bot.printToConsole("Please configure your bot and start it again.");
-			D2Bot.stop();
+			Controller.printToConsole("libs/config/" + classes[me.classid] + "." + me.name + ".js has been created.");
+			Controller.printToConsole("Please configure your bot and start it again.");
+			Controller.stop();
 
 			break;
 		}
