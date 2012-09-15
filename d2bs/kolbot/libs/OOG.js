@@ -51,7 +51,7 @@ var GameDataCommunicator = function () {
 		getGameData: function (profile) {
 			var req = {
 				id: CopyDataIds.RequestGame,
-				msg = me.profile
+				msg: me.profile
 			};
 			nextGame = undefined;
 			Controller.sendMessage(profile, req);

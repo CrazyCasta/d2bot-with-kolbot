@@ -25,10 +25,6 @@ include("common/Town.js");
 var gidList = []; // fast pickit
 
 function main() {
-	if (!getScript("tools/heartbeat.js")) {
-		load("tools/heartbeat.js");
-	}
-
 	// wait until game is ready
 	while (!me.gameReady || typeof copyUnit(me).classid === "undefined") {
 		delay(50);

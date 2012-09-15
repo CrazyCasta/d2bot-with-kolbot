@@ -321,7 +321,6 @@ include("common/pather.js");
 include("common/misc.js");
 include("common/config.js");
 include("common/prototypes.js");
-load("tools/heartbeat.js");
 
 function main() {
 	delay(rand(1, 2) * 1000);

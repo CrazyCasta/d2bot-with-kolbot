@@ -28,7 +28,6 @@ include("json2.js");
 include("OOG.js");
 include("automule.js");
 include("torchsystem.js");
-load("tools/heartbeat.js");
 
 var gameName, gamePass, oldGame, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
 	isUp = "no",

@@ -33,7 +33,6 @@ include("OOG.js");
 include("automule.js");
 include("gambling.js");
 include("torchsystem.js");
-load("tools/heartbeat.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
@@ -124,7 +123,7 @@ function timer(tick) {
 }
 
 function updateGameInfo() {
-	gameInfo = Controller.getGameInfo();
+	var gameInfo = Controller.getGameInfo();
 	gameName = gameInfo.name;
 	gamePass = gameInfo.password;
 	difficulty = gameInfo.difficulty;
