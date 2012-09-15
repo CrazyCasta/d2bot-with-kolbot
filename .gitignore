@@ -1,0 +1,13 @@
+profile.ini
+d2bot.log
+
+d2bs/d2bs.ini
+d2bs/d2bs.log
+
+d2bs/kolbot/data/*
+d2bs/kolbot/logs/*
+d2bs/kolbot/mules/*
+
+# vim junk
+*~
+*.swp
