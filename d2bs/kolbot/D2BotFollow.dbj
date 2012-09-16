@@ -148,11 +148,6 @@ function main() {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				if (!ingame) {
-					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
-						print("leaving game");
-						quit();
-					}
-
 					print("Updating Status");
 					//Controller.updateStatus("Game: " + me.gamename);
 
