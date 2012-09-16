@@ -389,7 +389,7 @@ RuneLoop:
 				}
 
 				print("ÿc4Runewords: ÿc0Rerolling runeword: " + base.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, ""));
-				Controller.printToConsole("Rerolling runeword:" + base.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "") + ";5");
+				Controller.printToConsole("Rerolling runeword: " + base.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]/, "") + ";5");
 				transmute();
 				delay(500);
 

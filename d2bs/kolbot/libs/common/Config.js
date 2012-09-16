@@ -12,7 +12,7 @@ var Config = {
 			configFilename = "",
 			classes = ["Amazon", "Sorceress", "Necromancer", "Paladin", "Barbarian", "Druid", "Assassin"];
 
-		for (i = 0; i < 5; i += 1) {
+		for (i = 0; i < 6; i += 1) {
 			switch (i) {
 			case 0:
 				configFilename = me.realm + "." + classes[me.classid] + "." + me.profile + ".js";
@@ -34,6 +34,10 @@ var Config = {
 				configFilename = me.profile + ".js";
 
 				break;
+			case 5:
+				configFilename = "Config." + me.profile + "." + me.charname + ".js"; // Added to make it easier to have hundreds of configs.
+
+				break;
 			}
 
 			if (FileTools.exists("libs/config/" + configFilename)) {
@@ -43,7 +47,7 @@ var Config = {
 
 		if (!FileTools.exists("libs/config/" + configFilename)) {
 			if (notify) {
-				print("ÿc1" + configFilename + ".js not found!");
+				print("ÿc1" + classes[me.classid] + "." + me.charname + ".js not found!"); // Use the primary format
 				print("ÿc1Loading default config.");
 			}
 
@@ -145,7 +149,7 @@ var Config = {
 	FHR: 0,
 	FBR: 0,
 	IAS: 0,
-	PacketTeleport: false,
+	PacketCasting: 0,
 
 	// Anti-hostile
 	AntiHostile: false,
@@ -260,6 +264,7 @@ var Config = {
 		RandomPrecast: false
 	},
 	BaalHelper: {
+		Wait: 120,
 		KillNihlathak: false,
 		FastChaos: false,
 		DollQuit: false,
@@ -297,7 +302,8 @@ var Config = {
 	},
 	Mephisto: {
 		MoatTrick: false,
-		KillCouncil: false
+		KillCouncil: false,
+		TakeRedPortal: false
 	},
 	ShopBot: {
 		ScanIDs: [],
@@ -309,9 +315,25 @@ var Config = {
 	OrgTorch: {
 		WaitForKeys: false,
 		WaitTimeout: false,
-		UseSalvation: false
+		UseSalvation: false,
+		GetFade: false
 	},
 	Synch: {
 		WaitFor: []
+	},
+	TristramLeech: {
+		Leader: "",
+		Wait: 120
+	},
+	TravincalLeech: {
+		Leader: "",
+		Helper: false,
+		Wait: 120
+	},
+	Tristram: {
+		PortalLeech: false
+	},
+	Travincal: {
+		PortalLeech: false
 	}
 };

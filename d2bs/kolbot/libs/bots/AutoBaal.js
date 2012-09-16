@@ -101,7 +101,7 @@ function AutoBaal() {
 				Precast.doPrecast(true);
 
 				for (i = 4; i > 1; i -= 1) {
-					if (Misc.getShrinesInArea(i, 15)) {
+					if (Misc.getShrinesInArea(i, 15, true)) {
 						break;
 					}
 				}
@@ -111,7 +111,7 @@ function AutoBaal() {
 					Pather.useWaypoint(5);
 
 					for (i = 5; i < 8; i += 1) {
-						if (Misc.getShrinesInArea(i, 15)) {
+						if (Misc.getShrinesInArea(i, 15, true)) {
 							break;
 						}
 					}
@@ -125,8 +125,7 @@ function AutoBaal() {
 
 			if (throneCheck && me.area === 109) { // wait for throne signal - leader's safe message
 				print("ÿc4AutoBaal: ÿc0Trying to take TP to throne.");
-				Pather.usePortal(131, leader); // take TP to throne
-				delay(500);
+				Pather.usePortal(131, null); // take TP to throne
 				Pather.moveTo(15113, 5050); // move to a safe spot
 				Precast.doPrecast(true);
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
@@ -146,7 +145,7 @@ function AutoBaal() {
 				print("ÿc4AutoBaal: ÿc0Entering chamber.");
 
 				if (Pather.usePortal(null, null, portal)) { // enter chamber
-					Pather.moveTo(15166, 5903); // go to a safe position
+					Pather.moveTo(15177, 5952); // go to a safe position
 				}
 
 				Town.getCorpse(); // check for corpse - happens if you die and reenter
