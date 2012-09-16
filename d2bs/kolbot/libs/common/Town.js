@@ -59,6 +59,10 @@ var Town = {
 
 	// Do town chores
 	doChores: function () {
+		if (!me.inTown) {
+			this.goToTown();
+		}
+
 		var i,
 			cancelFlags = [0x01, 0x02, 0x04, 0x08, 0x14, 0x16, 0x0c, 0x0f];
 
@@ -77,6 +81,16 @@ var Town = {
 		this.identify();
 		this.shopItems();
 		this.buyKeys();
+		
+		/*me.cancel();
+				
+		for (i = 0; i < 10; i += 1) {
+			var pickupgold = getUnit(4, 523, 3);
+			if (pickupgold) {
+				Pickit.pickItem(pickupgold);
+			}
+		}*/
+		
 		this.repair();
 		this.gamble();
 		this.reviveMerc();
@@ -149,8 +163,6 @@ var Town = {
 		if (!this.initNPC("Heal")) {
 			return false;
 		}
-
-		delay(750);
 
 		return true;
 	},
@@ -234,8 +246,6 @@ var Town = {
 			col = this.checkColumns(); // Re-initialize columns (needed because 1 shift-buy can fill multiple columns)
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -317,8 +327,6 @@ var Town = {
 			return false;
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -349,7 +357,7 @@ var Town = {
 		// Avoid unnecessary NPC visits
 		for (i = 0; i < list.length; i += 1) {
 			// Only unid items or sellable junk (low level) should trigger a NPC visit
-			if ([-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1) {
+			if ((!list[i].getFlag(0x10) || Config.LowGold > 0) && [-1, 4].indexOf(Pickit.checkItem(list[i]).result) > -1) {
 				break;
 			}
 		}
@@ -475,8 +483,6 @@ MainLoop:
 			}
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -531,9 +537,8 @@ MainLoop:
 			}
 
 			if (cain && cain.openMenu()) {
-				delay(10);
 				cain.useMenu(0x0FB4);
-				delay(500);
+				delay(1000);
 				me.cancel();
 			}
 
@@ -715,8 +720,6 @@ MainLoop:
 			}
 		}
 
-		delay(750);
-
 		return true;
 	},
 
@@ -739,6 +742,8 @@ MainLoop:
 		while (items.length > 0) {
 			list.push(items.shift().gid);
 		}
+		
+		me.cancel();
 
 		while (me.getStat(14) + me.getStat(15) >= Config.GambleGoldStop) {
 			if (!getInteractedNPC()) {
@@ -785,8 +790,6 @@ MainLoop:
 
 			me.cancel();
 		}
-
-		delay(750);
 
 		return true;
 	},
@@ -841,8 +844,6 @@ MainLoop:
 
 			return false;
 		}
-
-		delay(750);
 
 		return true;
 	},
@@ -924,7 +925,6 @@ MainLoop:
 		}
 
 		//this.shopItems();
-		delay(750);
 
 		return true;
 	},
@@ -1024,11 +1024,10 @@ MainLoop:
 			return false;
 		}
 
-		delay(300);
-
 MainLoop:
 		for (i = 0; i < 3; i += 1) {
 			npc.useMenu(0x1507);
+			delay(1000);
 
 			tick = getTickCount();
 
@@ -1037,7 +1036,7 @@ MainLoop:
 					break MainLoop;
 				}
 
-				delay(10);
+				delay(100);
 			}
 		}
 
@@ -1103,13 +1102,24 @@ MainLoop:
 			}
 		}
 
-		delay(750);
-
 		return true;
 	},
 
 	needStash: function () {
-		return Storage.Inventory.Compare(Config.Inventory).length > 0 || (me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5);
+		if (Config.StashGold && me.getStat(14) >= Config.StashGold && me.getStat(15) < 25e5) {
+			return true;
+		}
+
+		var i,
+			items = Storage.Inventory.Compare(Config.Inventory);
+
+		for (i = 0; i < items.length; i += 1) {
+			if (Storage.Stash.CanFit(items[i])) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 
 	openStash: function () {
@@ -1411,7 +1421,7 @@ MainLoop:
 			break;
 		case 5:
 			this.act[4].spot = {};
-			this.act[4].spot.portalspot = [5097, 5024];
+			this.act[4].spot.portalspot = [5092, 5024];
 			this.act[4].spot.stash = [5129, 5061];
 			this.act[4].spot[NPC.Larzuk] = [5141, 5045];
 			this.act[4].spot[NPC.Malah] = [5078, 5029];
@@ -1432,8 +1442,8 @@ MainLoop:
 	move: function (spot) {
 		var i;
 
-		if (!me.inTown) { // To prevent long trips if tp to town failed
-			throw new Error("Town.move: You're not in town!");
+		if (!me.inTown && !this.goToTown()) { // To prevent long trips if tp to town failed
+			throw new Error("Town.move: Failed to go to town!");
 		}
 
 		// TODO: Add character config variable for telekinesis

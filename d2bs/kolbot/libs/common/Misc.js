@@ -33,52 +33,67 @@ var Skill = {
 			y = me.y;
 		}
 
-		switch (hand) {
-		case 0:
-			clickType = 3;
-			shift = 0;
-			break;
-		case 1:
-			clickType = 0;
-			shift = 1;
-			break;
-		case 2: // For melee skills that don't need shift
-			clickType = 0;
-			shift = 0;
-			break;
-		}
-
 		if (!this.setSkill(skillId, hand)) {
 			return false;
 		}
 
+		if (Config.PacketCasting > 1) {
+			switch (typeof x) {
+			case "number":
+				Packet.castSkill(hand, x, y);
+				delay(300);
+
+				break;
+			case "object":
+				Packet.unitCast(hand, x);
+				delay(300);
+
+				break;
+			}
+		} else {
+			switch (hand) {
+			case 0:
+				clickType = 3;
+				shift = 0;
+				break;
+			case 1:
+				clickType = 0;
+				shift = 1;
+				break;
+			case 2: // For melee skills that don't need shift
+				clickType = 0;
+				shift = 0;
+				break;
+			}
+
 MainLoop:
-		for (n = 0; n < 3; n += 1) {
-			if (typeof x === "object") {
-				clickMap(clickType, shift, x);
-			} else {
-				clickMap(clickType, shift, x, y);
-			}
-
-			delay(30);
-
-			if (typeof x === "object") {
-				clickMap(clickType + 2, shift, x);
-			} else {
-				clickMap(clickType + 2, shift, x, y);
-			}
-
-			for (i = 0; i < 4; i += 1) {
-				if (me.attacking) {
-					break MainLoop;
+			for (n = 0; n < 3; n += 1) {
+				if (typeof x === "object") {
+					clickMap(clickType, shift, x);
+				} else {
+					clickMap(clickType, shift, x, y);
 				}
 
-				delay(40);
-			}
-		}
+				delay(30);
 
-		while (me.attacking) {
-			delay(10);
+				if (typeof x === "object") {
+					clickMap(clickType + 2, shift, x);
+				} else {
+					clickMap(clickType + 2, shift, x, y);
+				}
+
+				for (i = 0; i < 4; i += 1) {
+					if (me.attacking) {
+						break MainLoop;
+					}
+
+					delay(40);
+				}
+			}
+
+			while (me.attacking) {
+				delay(10);
+			}
 		}
 
 		if (this.isTimed(skillId)) { // account for lag, state 121 doesn't kick in immediately
@@ -286,7 +301,7 @@ var Misc = {
 	},
 
 	// Check all shrines in area and get the first one of specified type
-	getShrinesInArea: function (area, type) {
+	getShrinesInArea: function (area, type, use) {
 		var i, coords, shrine,
 			shrineLocs = [],
 			shrineIds = [2, 81, 83],
@@ -305,14 +320,18 @@ var Misc = {
 
 			coords = shrineLocs.shift();
 
-			Pather.moveTo(coords[0], coords[1], 2, false, true);
+			Pather.moveTo(coords[0], coords[1], 2);
 
 			shrine = getUnit(2, "shrine");
 
 			if (shrine) {
 				do {
 					if (shrine.objtype === type) {
-						this.getShrine(shrine);
+						if (use) {
+							return this.getShrine(shrine);
+						}
+
+						//Pather.moveTo(coords[0], coords[1], 2);
 
 						return true;
 					}
@@ -633,15 +652,49 @@ var Experience = {
 		return Math.round(this.nextExp[me.getStat(12)] / this.gain());
 	},
 
+	// Total time till next level
+	timeToLevel: function () {
+		var tTLrawSeconds = (Math.floor((getTickCount() - me.gamestarttime) / 1000)).toString(),
+			tTLrawtimeToLevel = this.runsToLevel() * tTLrawSeconds,
+			tTLDays = Math.floor(tTLrawtimeToLevel / 86400),
+			tTLHours = Math.floor((tTLrawtimeToLevel % 86400) / 3600),
+			tTLMinutes = Math.floor(((tTLrawtimeToLevel % 86400) % 3600) / 60),
+			tTLSeconds = ((tTLrawtimeToLevel % 86400) % 3600) % 60;
+
+		//return tDays + "d " + tTLHours + "h " + tTLMinutes + "m " + tTLSeconds + "s";
+		//return tTLDays + "d " + tTLHours + "h " + tTLMinutes + "m";
+		return (tTLDays ? tTLDays + " d " : "") + (tTLHours ? tTLHours + " h " : "") + (tTLMinutes ? tTLMinutes + " m" : "");
+	},
+
+	// Get Game Time
+	getGameTime: function () {
+		var rawMinutes = Math.floor((getTickCount() - me.gamestarttime) / 60000).toString(),
+			rawSeconds = (Math.floor((getTickCount() - me.gamestarttime) / 1000) % 60).toString();
+
+		if (rawMinutes <= 9) {
+			rawMinutes = "0" + rawMinutes;
+		}
+
+		if (rawSeconds <= 9) {
+			rawSeconds = "0" + rawSeconds;
+		}
+
+		//return rawMinutes + "m " + rawSeconds + "s";
+		return " (" + rawMinutes + ":" + rawSeconds + ")";
+	},
+
 	// Log to manager
 	log: function () {
 		var string,
 			gain = this.gain(),
 			progress = this.progress(),
 			runsToLevel = this.runsToLevel(),
-			totalRunsToLevel = this.totalRunsToLevel();
+			totalRunsToLevel = this.totalRunsToLevel(),
+			getGameTime = this.getGameTime(),
+			timeToLevel = this.timeToLevel();
 
-		string = "Game: " + me.gamename + ", XP Gain: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next: " + runsToLevel + "/" + totalRunsToLevel;
+		//string = "[Game: " + me.gamename + (me.gamepassword ? "//" + me.gamepassword : "") + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP: " + gain + "] [Games ETA: " + runsToLevel + "] [Time ETA: " + timeToLevel + "]";
+		string = "[Game: " + me.gamename + (me.gamepassword ? "//" + me.gamepassword : "") + getGameTime + "] [Level: " + me.getStat(12) + " (" + progress + "%)] [XP: " + gain + "] [Games ETA: " + runsToLevel + "]";
 
 		if (gain) {
 			D2Bot.printToConsole(string + ";4");
