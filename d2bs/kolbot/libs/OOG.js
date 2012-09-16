@@ -54,9 +54,9 @@ var GameDataCommunicator = function () {
 				msg: me.profile
 			};
 			nextGame = undefined;
-			Controller.sendMessage(profile, req);
 			while (nextGame === undefined) {
-				delay(10);
+				Controller.sendMessage(profile, req);
+				delay(1000);
 			}
 			return {
 				nextGame: nextGame,
