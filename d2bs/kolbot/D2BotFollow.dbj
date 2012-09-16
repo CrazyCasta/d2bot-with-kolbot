@@ -328,7 +328,6 @@ JoinLoop:
 
 		var gameData;
 
-		print("Getting game data.");
 		for (i = 0; i < 5; i += 1) {
 			gameData = GameDataCommunicator.getGameData(leader);
 
