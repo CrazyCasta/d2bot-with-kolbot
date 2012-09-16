@@ -325,65 +325,13 @@ var Misc = {
 
 	// Log kept item stats in the manager.
 	logItem: function (action, unit, keptLine) {
-		var i, lastArea, code, desc,
-			stringColor = "",
-			color = -1,
-			name = unit.fname.split("\n").reverse().join(" ").replace(/ÿc[0-9!"+<;.*]|^ /, "");
-
-		desc = unit.description.split("\n");
-
-		// Lines are normally in reverse. Add color tags if needed and reverse order.
-		for (i = 0; i < desc.length; i += 1) {
-			if (desc[i].match(/^ÿ/)) {
-				stringColor = desc[i].substring(0, 3);
-			} else {
-				desc[i] = stringColor + desc[i];
-			}
-		}
-
-		desc = desc.reverse().join("\n");
-		color = unit.getColor();
-		desc += ("\nÿc0Item Level: " + unit.ilvl);
+		var lastArea = undefined;
 
 		if (action === "Kept") {
 			lastArea = DataFile.getStats().lastArea;
-
-			if (lastArea) {
-				desc += ("\nÿc0Area: " + lastArea);
-			}
 		}
 
-		// experimental
-		/*switch (unit.quality) {
-		case 5:
-			// needs item by item handling :/
-			break;
-		case 7:
-			for (i = 0; i < 401; i += 1) {
-				if (unit.fname.split("\n").reverse()[0].indexOf(getLocaleString(getBaseStat(17, i, 2))) > -1) {
-					code = getBaseStat(17, i, "invfile");
-
-					break;
-				}
-			}
-
-			break;
-		}*/
-
-		if (!code) {
-			code = getBaseStat(0, unit.classid, 'normcode') || unit.code;
-			code = code.replace(" ", "");
-
-			if ([10, 12, 58, 82, 83, 84].indexOf(unit.itemType) > -1) {
-				code += (unit.gfx + 1);
-			}
-		}
-
-		if (keptLine) {
-			desc += ("\nÿc0Line: " + keptLine);
-		}
-
-		D2Bot.printToItemLog(action + " " + name, desc, code, unit.quality, color);
+		Controller.logItem(unit, action, keptLine, lastArea);
 	},
 
 	// Change into werewolf or werebear
@@ -644,10 +592,10 @@ var Experience = {
 		string = "Game: " + me.gamename + ", XP Gain: " + gain + ", Level: " + me.getStat(12) + " (" + progress + "%), Next: " + runsToLevel + "/" + totalRunsToLevel;
 
 		if (gain) {
-			D2Bot.printToConsole(string + ";4");
+			Controller.printToConsole(string + ";4");
 
 			if (me.getStat(12) > DataFile.getStats().level) {
-				D2Bot.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";5");
+				Controller.printToConsole("Congrats! You gained a level. Current level:" + me.getStat(12) + ";5");
 			}
 		}
 	}

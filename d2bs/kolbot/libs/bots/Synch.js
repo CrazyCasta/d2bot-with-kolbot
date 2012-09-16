@@ -31,7 +31,7 @@ function Synch() {
 		for (j = 0; j < Config.Synch.WaitFor.length; j += 1) {
 			party = getParty(Config.Synch.WaitFor[j]);
 			if (!party) {
-				D2Bot.printToConsole("WaitFor not in game: " +
+				Controller.printToConsole("WaitFor not in game: " +
 						Config.Synch.WaitFor[j] + " so quitting.");
 
 				removeEventListener("chatmsg", messageHandler);
@@ -42,7 +42,7 @@ function Synch() {
 	}
 
 	if (!Synched) {
-		D2Bot.printToConsole("Failed to sync.");
+		Controller.printToConsole("Failed to sync.");
 		quit();
 	}
 

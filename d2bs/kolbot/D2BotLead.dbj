@@ -33,46 +33,22 @@ include("OOG.js");
 include("automule.js");
 include("gambling.js");
 include("torchsystem.js");
-load("tools/heartbeat.js");
 
 if (!FileTools.exists("data/" + me.profile + ".json")) {
 	DataFile.create();
 }
 
-var difficulty, error, keyswap, rdblocker, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
+var difficulty, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
 	gamePass = "",
 	gameName = "",
-	nextGame = "",
 	lastGameStatus = "ready",
-	gameCount = DataFile.getStats().runs + 1,
-	isUp = "no";
-
-function ReceiveCopyData(msgID, msg) {
-	switch (msgID) {
-	case 2: // game info
-		print("Recieved Game Info");
-
-		[gameName, gamePass, difficulty, error, keyswap, rdblocker] = msg.split('/');
-		keyswap = parseInt(keyswap, 10);
-		rdblocker = parseInt(rdblocker, 10);
-
-		break;
-	case 1: // join
-		[nextGame, gamePass, isUp] = msg.split('/');
-
-		break;
-	case 3: // request game
-		D2Bot.joinMe(msg, gameName, gameCount, gamePass, isUp);
-
-		break;
-	}
-}
+	gameCount = DataFile.getStats().runs + 1;
 
 function timeoutDelay(text, time) {
 	var endTime = getTickCount() + time;
 
 	while (getTickCount() < endTime) {
-		D2Bot.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
+		Controller.updateStatus(text + " (" + Math.floor((endTime - getTickCount()) / 1000) + "s)");
 		delay(500);
 	}
 }
@@ -88,7 +64,6 @@ function locationTimeout(time, location) {
 }
 
 function updateCount() {
-	D2Bot.updateCount();
 	delay(1000);
 	ControlAction.click(6, 264, 366, 272, 35);
 
@@ -147,21 +122,29 @@ function timer(tick) {
 	return " (" + min + ":" + sec + ")";
 }
 
+function updateGameInfo() {
+	var gameInfo = Controller.getGameInfo();
+	gameName = gameInfo.name;
+	gamePass = gameInfo.password;
+	difficulty = gameInfo.difficulty;
+}
+
 function main() {
-	addEventListener('copydata', ReceiveCopyData);
 	addEventListener('scriptmsg', ScriptMsgEvent);
 	delay(rand(1, 2) * 1000);
-	D2Bot.requestGameInfo();
 
-	if (error === "@error") {
+	GameDataCommunicator.setIsUp("no");
+	updateGameInfo();
+
+	if (Controller.error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
-		D2Bot.updateRuns();
+		Controller.report(ReportType.Run);
 	}
 
 	while (true) {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
-				isUp = "yes";
+				GameDataCommunicator.setIsUp("yes");
 
 				if (!ingame) {
 					gameStart = getTickCount();
@@ -172,7 +155,7 @@ function main() {
 					}
 
 					print("Updating Status");
-					//D2Bot.updateStatus("Game: " + me.gamename);
+					//Controller.updateStatus("Game: " + me.gamename);
 
 					lastGameStatus = "ingame";
 					ingame = true;
@@ -180,13 +163,13 @@ function main() {
 					DataFile.updateStats("runs", gameCount);
 				}
 
-				D2Bot.updateStatus("Game: " + me.gamename + timer(gameStart));
+				Controller.updateStatus("Game: " + me.gamename + timer(gameStart));
 			}
 
 			delay(1000);
 		}
 
-		isUp = "no";
+		GameDataCommunicator.setIsUp("no");
 
 		locationAction(getLocation());
 		delay(1000);
@@ -201,7 +184,7 @@ MainSwitch:
 	case 0:
 		break;
 	case 1:	// Lobby
-		D2Bot.updateStatus("Lobby");
+		Controller.updateStatus("Lobby");
 
 		if (ChannelConfig.hasOwnProperty(me.profile) && ChannelConfig[me.profile].JoinChannel !== "") {
 			ControlAction.click(6, 27, 480, 120, 20);
@@ -220,9 +203,8 @@ MainSwitch:
 
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
+				GameDataCommunicator.setIsUp("no");
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -242,7 +224,7 @@ MainSwitch:
 			// ### Torch System end ###
 
 			print("updating runs");
-			D2Bot.updateRuns();
+			Controller.report(ReportType.Run);
 
 			gameCount += 1;
 			lastGameStatus = "ready";
@@ -284,13 +266,13 @@ MainSwitch:
 
 		break;
 	case 2: // Waiting In Line
-		D2Bot.updateStatus("Waiting...");
+		Controller.updateStatus("Waiting...");
 		locationTimeout(StarterConfig.WaitInLineTimeout * 1e3, location);
 		ControlAction.click(6, 433, 433, 96, 32);
 
 		break;
 	case 3: // Lobby Chat
-		D2Bot.updateStatus("Lobby Chat");
+		Controller.updateStatus("Lobby Chat");
 
 		if (ingame) {
 			if (getTickCount() - gameStart < StarterConfig.MinGameTime * 1e3) {
@@ -299,9 +281,8 @@ MainSwitch:
 
 			// ### automule ###
 			if (muleTrigger || torchMuleTrigger) {
-				removeEventListener('copydata', ReceiveCopyData);
+				GameDataCommunicator.setIsUp("no");
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
-				addEventListener('copydata', ReceiveCopyData);
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -321,7 +302,7 @@ MainSwitch:
 			// ### Torch System end ###
 
 			print("updating runs");
-			D2Bot.updateRuns();
+			Controller.report(ReportType.Run);
 
 			gameCount += 1;
 			lastGameStatus = "ready";
@@ -381,7 +362,7 @@ MainSwitch:
 
 		break;
 	case 4: // Create Game
-		D2Bot.updateStatus("Creating Game");
+		Controller.updateStatus("Creating Game");
 
 		control = getControl(1, 657, 342, 27, 20);
 
@@ -396,12 +377,12 @@ MainSwitch:
 		}
 
 		while (!gameName) {
-			D2Bot.requestGameInfo();
+			updateGameInfo();
 			delay(500);
 		}
 
 		if (lastGameStatus === "pending") {
-			D2Bot.printToConsole("Failed to create game");
+			Controller.printToConsole("Failed to create game");
 			timeoutDelay("FTJ delay", StarterConfig.FTJDelay * 1e3);
 
 			gameCount += 1;
@@ -431,7 +412,7 @@ MainSwitch:
 			firstLogin = true;
 		}
 
-		D2Bot.updateStatus("Logging In");
+		Controller.updateStatus("Logging In");
 
 		try {
 			login(me.profile);
@@ -455,34 +436,34 @@ MainSwitch:
 
 			switch (string) {
 			case getLocaleString(5207):
-				D2Bot.updateStatus("Invalid Password");
-				D2Bot.printToConsole("Invalid Password");
+				Controller.updateStatus("Invalid Password");
+				Controller.printToConsole("Invalid Password");
 				break;
 			case getLocaleString(5208):
-				D2Bot.updateStatus("Invalid Account");
-				D2Bot.printToConsole("Invalid Account");
+				Controller.updateStatus("Invalid Account");
+				Controller.printToConsole("Invalid Account");
 				break;
 			case getLocaleString(5199):
-				D2Bot.updateStatus("Disabled CDKey");
-				D2Bot.printToConsole("Disabled CDKey");
-				D2Bot.CDKeyDisabled();
+				Controller.updateStatus("Disabled CDKey");
+				Controller.printToConsole("Disabled CDKey");
+				Controller.report(ReportType.CDKeyDisabled);
 
-				if (keyswap) {
+				if (Controller.keyswap) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-					D2Bot.restart(true);
+					Controller.restartProfile();
 				} else {
-					D2Bot.stop();
+					Controller.stopProfile();
 				}
 
 				break;
 			case getLocaleString(5347):
-				D2Bot.updateStatus("Disconnected");
-				D2Bot.printToConsole("Disconnected");
+				Controller.updateStatus("Disconnected");
+				Controller.printToConsole("Disconnected");
 				ControlAction.click(6, 335, 412, 128, 35);
 				break MainSwitch;
 			default:
-				D2Bot.updateStatus("Login Error");
-				D2Bot.printToConsole("Login Error - " + string);
+				Controller.updateStatus("Login Error");
+				Controller.printToConsole("Login Error - " + string);
 				break;
 			}
 		}
@@ -495,7 +476,7 @@ MainSwitch:
 
 		break;
 	case 11: // Unable To Connect
-		D2Bot.updateStatus("Unable To Connect");
+		Controller.updateStatus("Unable To Connect");
 
 		if (connectFail) {
 			timeoutDelay("Unable to Connect", StarterConfig.UnableToConnectDelay * 6e4);
@@ -519,7 +500,7 @@ MainSwitch:
 
 		break;
 	case 13: // Realm Down - Character Select screen
-		D2Bot.updateStatus("Realm Down");
+		Controller.updateStatus("Realm Down");
 		delay(1000);
 
 		if (!ControlAction.click(6, 33, 572, 128, 35)) {
@@ -528,19 +509,19 @@ MainSwitch:
 
 		updateCount();
 		timeoutDelay("Realm Down", StarterConfig.RealmDownDelay * 6e4);
-		D2Bot.CDKeyRD();
+		Controller.report(ReportType.RealmDown);
 
-		if (keyswap) {
-			D2Bot.printToConsole("Realm Down - Changing CD-Key");
+		if (Controller.keyswap) {
+			Controller.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
+			Controller.restartProfile();
 		} else {
-			D2Bot.restart();
+			Controller.restartProfile();
 		}
 
 		break;
 	case 14: // Character Select / Main Menu - Disconnected
-		D2Bot.updateStatus("Disconnected");
+		Controller.updateStatus("Disconnected");
 		delay(500);
 		ControlAction.click(6, 351, 337, 96, 32);
 
@@ -559,12 +540,12 @@ MainSwitch:
 
 		break;
 	case 19: // Login - Cdkey In Use
-		D2Bot.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
-		D2Bot.CDKeyInUse();
+		Controller.printToConsole("CD-Key in use by " + ControlAction.getText(4, 158, 310, 485, 40));
+		Controller.report(ReportType.CDKeyInUse);
 
-		if (keyswap) {
+		if (Controller.keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
+			Controller.restartProfile();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -580,10 +561,12 @@ MainSwitch:
 
 		break;
 	case 22: // Login - Invalid Cdkey (classic or xpac)
-		if (keyswap) {
-			D2Bot.printToConsole("Invalid CD-Key");
+		Controller.report(ReportType.CDKeyInvalid);
+
+		if (Controller.keyswap) {
+			Controller.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			D2Bot.restart(true);
+			Controller.restartProfile();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -614,14 +597,15 @@ MainSwitch:
 	case 27: // Gateway Select
 		break;
 	case 28: // Lobby - Game Does Not Exist
-		D2Bot.printToConsole("Game doesn't exist");
+		Controller.printToConsole("Game doesn't exist");
 
-		if (rdblocker) {
-			D2Bot.printToConsole("CDKey is probably flagged.");
+		if (Controller.rdblocker) {
+			Controller.printToConsole("CDKey is probably flagged.");
 
-			if (keyswap) {
+			if (Controller.keyswap) {
+				Controller.report(ReportType.CDKeyFlagged);
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-				D2Bot.restart(true);
+				Controller.restartProfile();
 			}
 		} else {
 			locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location);
@@ -639,9 +623,9 @@ MainSwitch:
 		break;
 	default:
 		if (location !== undefined) {
-			D2Bot.printToConsole("Unhandled location " + location);
+			Controller.printToConsole("Unhandled location " + location);
 			delay(500);
-			D2Bot.restart();
+			Controller.restartProfile();
 		}
 
 		break;

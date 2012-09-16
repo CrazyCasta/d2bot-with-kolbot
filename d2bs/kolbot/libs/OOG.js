@@ -4,74 +4,69 @@
 *	@desc		handle out of game operations like creating characters/accounts, maintaining profile datafiles, d2bot# logging etc.
 */
 
-var D2Bot = {
-	printToConsole: function (msg, color) {
-		if (arguments.length < 2) {
-			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg);
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "printToConsole;" + msg + ";" + color);
-		}
-	},
-	printToItemLog: function (msg, tooltip, code, color1, color2, header, gid) {
-		header = header || "";
-		gid = gid || "";
+include("GameController.js")
 
-		sendCopyData(null, "D2Bot #", 0, "printToItemLog;" + msg + "$" + tooltip + "$" + code + "$" + header + "$" + gid + ";" + color1 + ";" + color2 + ";" + header);
+var Controller = new ThisGameController();
+
+var Messages = {
+	JoinMeMsg: function (gameName, gameCount, gamePass, isUp) {
+		this.id = 1;
+		this.msg = gameName + gameCount + "/" + gamePass + "/" + isUp;
 	},
-	saveItem: function (filename, tooltip, code, color1, color2) {
-		sendCopyData(null, "D2Bot #", 0, "saveItem;" + filename + "$" + tooltip + "$" + code + ";" + color1 + ";" + color2);
-	},
-	updateStatus: function (msg) {
-		sendCopyData(null, "D2Bot #", 0, "updateStatus;" + msg);
-	},
-	updateRuns: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateRuns");
-	},
-	updateChickens: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateChickens");
-	},
-	requestGameInfo: function () {
-		sendCopyData(null, "D2Bot #", 0, "requestGameInfo");
-		delay(500);
-	},
-	restart: function (reset) {
-		if (arguments.length > 0) {
-			sendCopyData(null, "D2Bot #", 0, "restartProfile;" + reset.toString());
-		} else {
-			sendCopyData(null, "D2Bot #", 0, "restartProfile");
-		}
-	},
-	CDKeyInUse: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyInUse");
-	},
-	CDKeyDisabled: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyDisabled");
-	},
-	CDKeyRD: function () {
-		sendCopyData(null, "D2Bot #", 0, "CDKeyRD");
-	},
-	joinMe: function (window, gameName, gameCount, gamePass, isUp) {
-		sendCopyData(null, window, 1, gameName + gameCount + "/" + gamePass + "/" + isUp);
-	},
-	requestGame: function (who) {
-		sendCopyData(null, who, 3, me.profile);
-	},
-	stop: function () {
-		sendCopyData(null, "D2Bot #", 0, "stop"); //this stops current window
-	},
-	start: function (profile) {
-		sendCopyData(null, "D2Bot #", 0, "start;" + profile); //this starts a particular profile.ini
-	},
-	updateCount: function () {
-		sendCopyData(null, "D2Bot #", 0, "updateCount;" + getIP());
-	},
-	shoutGlobal: function (msg, mode) {
-		sendCopyData(null, "D2Bot #", 0, "shoutGlobal;" + msg + ";" + mode.toString() + ";");
-	},
-	heartBeat: function () {
-		sendCopyData(null, "D2Bot #", 0, "heartBeat");
+	RequestGameMsg: function () {
+		this.id = 3;
+		this.msg = me.profile;
 	}
 };
+
+var GameDataCommunicator = function () {
+	const CopyDataIds = {
+		Join: 1,
+		RequestGame: 3
+	};
+	var nextGame, gamePass, isUp = "no";
+
+	var msgHandler = function (msg) {
+		var resp;
+		switch(msg.id) {
+			case CopyDataIds.Join:
+				[nextGame, gamePass, isUp] = msg.msg.split('/');
+				break;
+			case CopyDataIds.RequestGame:
+				resp = {
+					id: CopyDataIds.Join,
+					msg: me.gamename + "/" + me.gamepassword + "/" + isUp
+				};
+				Controller.sendMessage(msg.msg, resp);
+				break;
+		}
+	};
+
+	Controller.addMessageHandler(msgHandler);
+
+	return {
+		setIsUp: function (_isUp) {
+			isUp = _isUp;
+		},
+		getGameData: function (profile) {
+			var req = {
+				id: CopyDataIds.RequestGame,
+				msg: me.profile
+			};
+			nextGame = undefined;
+			Controller.sendMessage(profile, req);
+			while (nextGame === undefined) {
+				delay(10);
+			}
+			return {
+				nextGame: nextGame,
+				gamePass: gamePass,
+				isUp: isUp
+			};
+		}
+	};
+}();
+
 var DataFile = {
 	create: function () {
 		var obj, string;

@@ -668,7 +668,7 @@ IngredientLoop:
 				transmute();
 				delay(700 + me.ping);
 				print("ÿc4Cubing: " + string);
-				D2Bot.printToConsole(string + ";5");
+				Controller.printToConsole(string + ";5");
 				this.buildLists();
 
 				items = me.findItems(-1, -1, 6);
