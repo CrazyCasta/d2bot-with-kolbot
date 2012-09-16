@@ -42,13 +42,21 @@ var GameDataCommunicator = function () {
 		}
 	};
 
+	var scrMsgHandler = function (id, _isUp) {
+		if (id === "GameDataCommunicator.setIsUp") {
+			isUp = _isUp;
+		}
+	};
+
 	Controller.addMessageHandler(msgHandler);
+	addEventListener("scriptmsg", scrMsgHandler);
 
 	return {
 		setIsUp: function (_isUp) {
-			isUp = _isUp;
+			scriptBroadcast("GameDataCommunicator.setIsUp", _isUp);
 		},
 		getGameData: function (profile) {
+			var i;
 			var req = {
 				id: CopyDataIds.RequestGame,
 				msg: me.profile
