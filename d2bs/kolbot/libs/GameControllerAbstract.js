@@ -17,7 +17,7 @@ GameController.prototype = {
 	// Returns the Profile (d2bs primitive) to login with.
 	getProfile: function () {
 		return new Profile();
-	}
+	},
 
 	// Logging methods
 
