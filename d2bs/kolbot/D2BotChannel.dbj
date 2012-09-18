@@ -65,7 +65,7 @@ function updateCount() {
 	ControlAction.click(6, 264, 366, 272, 35);
 
 	try {
-		login(me.profile);
+		Controller.getProfile().login();
 	} catch (e) {
 
 	}
@@ -307,7 +307,7 @@ MainLoop:
 		Controller.updateStatus("Logging In");
 
 		try {
-			login(me.profile);
+			Controller.getProfile().login();
 		} catch (e) {
 			print(e);
 		}
