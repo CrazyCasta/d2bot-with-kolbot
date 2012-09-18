@@ -164,7 +164,7 @@ function BaalHelper() { // experi-mental
 		}
 	}
 
-	var i, tick, portal, party;
+	var i, tick, portal, party, entrance;
 
 	Town.goToTown(5);
 	Town.doChores();
@@ -187,7 +187,7 @@ function BaalHelper() { // experi-mental
 		}
 
 WSKLoop:
-		for (i = 0; i < 60; i += 1) {
+		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
 			party = getParty();
 
 			if (party) {
@@ -201,8 +201,26 @@ WSKLoop:
 			delay(1000);
 		}
 
-		if (i === 60) {
+		if (i === Config.BaalHelper.Wait) {
 			throw new Error("No players in Throne.");
+		}
+
+		for (i = 0; i < 3; i += 1) {
+			entrance = getUnit(5, 82);
+
+			if (entrance) {
+				break;
+			}
+
+			delay(200);
+		}
+
+		if (entrance) {
+			Pather.moveTo(entrance.x > me.x ? entrance.x - 5 : entrance.x + 5, entrance.y > me.y ? entrance.y - 5 : entrance.y + 5);
+		}
+
+		if (!Pather.moveToExit([130, 131], false)) {
+			throw new Error("Failed to move to WSK3.");
 		}
 
 		if (!Pather.moveToExit(131, true) || !Pather.moveTo(15113, 5040)) {
@@ -212,7 +230,7 @@ WSKLoop:
 		Pather.useWaypoint(109);
 		Town.move("portalspot");
 
-		for (i = 0; i < 90; i += 1) {
+		for (i = 0; i < Config.BaalHelper.Wait; i += 1) {
 			if (Pather.usePortal(131, null)) {
 				break;
 			}
@@ -220,7 +238,7 @@ WSKLoop:
 			delay(1000);
 		}
 
-		if (i === 90) {
+		if (i === Config.BaalHelper.Wait) {
 			throw new Error("No portals to Throne.");
 		}
 	}

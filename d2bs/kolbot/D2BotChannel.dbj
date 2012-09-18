@@ -342,9 +342,9 @@ MainLoop:
 
 				if (Controller.keyswap) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-					Controller.restart();
+					Controller.restartProfile();
 				} else {
-					Controller.stop();
+					Controller.stopProfile();
 				}
 
 				break;
@@ -398,7 +398,7 @@ MainLoop:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;
@@ -425,7 +425,7 @@ MainLoop:
 
 		if (Controller.keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
 			ControlAction.click(6, 335, 450, 128, 35);
@@ -445,7 +445,7 @@ MainLoop:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
 		}
@@ -468,11 +468,11 @@ MainLoop:
 	case 26: // Lobby - Game Name Exists
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		Controller.printToConsole("Game doesn't exist");
-
-		lastGameStatus = "ready";
 
 		if (!locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location)) {
 			ControlAction.click(6, 652, 469, 120, 20);
@@ -483,10 +483,11 @@ MainLoop:
 	case 38: // Game is full
 		Controller.printToConsole("Game is full");
 
-		lastGameStatus = "ready";
+		retry = 2;
 
-		delay(500);
 		ControlAction.click(6, 652, 469, 120, 20);
+		ControlAction.click(6, 433, 433, 96, 32);
+
 		break;
 	case 42: // Empty character screen
 		delay(1000);
@@ -497,7 +498,7 @@ MainLoop:
 		if (location !== undefined) {
 			Controller.printToConsole("Unhandled location " + location);
 			delay(500);
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;

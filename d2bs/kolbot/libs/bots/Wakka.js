@@ -21,10 +21,15 @@ function Wakka() {
 
 				if (suspect.area === destination) { // first player in our party found in destination area...
 					leader = suspect.name; // ... is our leader
+
+					if (suspect.area === 131) {
+						return false;
+					}
+
 					print("ÿc4Wakka: ÿc0Autodetected " + leader);
 					return true;
 				}
-			} while (suspect.getNext()); 
+			} while (suspect.getNext());
 
 			if (solofail === 0) { // empty game, nothing left to do
 				return false;
@@ -34,7 +39,7 @@ function Wakka() {
 		} while (!leader); // repeat until leader is found (or until game is empty)
 
 		return false;
-	};
+	}
 
 	this.checkMonsters = function (range, dodge) {
 		var monList = [],
@@ -104,7 +109,7 @@ function Wakka() {
 		if (glow) {
 			for (i = 0; i < 10; i += 1) {
 				if (me.getStat(12) >= stopLvl) {
-					Controller.stop();
+					Controller.stopProfile();
 				}
 
 				boss = getUnit(1, name);
@@ -120,7 +125,7 @@ function Wakka() {
 		}
 
 		return false;
-	}
+	};
 
 	this.getCorpse = function () {
 		if (me.mode === 17) {
@@ -138,7 +143,7 @@ function Wakka() {
 					Pather.moveToUnit(corpse);
 					corpse.interact();
 					delay(500);
-					
+
 					rval = true;
 				}
 			} while (corpse.getNext());
@@ -157,9 +162,9 @@ function Wakka() {
 
 		while (path.length > 0) {
 			if (me.getStat(12) >= stopLvl) {
-				Controller.stop();
+				Controller.stopProfile();
 			}
-			
+
 			if (me.mode === 17 || me.inTown) {
 				return false;
 			}
@@ -207,8 +212,8 @@ function Wakka() {
 			if (Pather.walkTo(path[0].x, path[0].y)) {
 				path.shift();
 			}
-			
-			this.getCorpse()
+
+			this.getCorpse();
 		}
 
 		return true;
@@ -229,7 +234,7 @@ function Wakka() {
 	if (AutoLeaderDetect(108)) {
 		while (Misc.inMyParty(leader)) {
 			if (me.getStat(12) >= stopLvl) {
-				Controller.stop();
+				Controller.stopProfile();
 			}
 
 			switch (me.area) {
@@ -271,7 +276,7 @@ function Wakka() {
 
 						break;
 					}
-					
+
 					if (this.checkBoss(getLocaleString(2851))) {
 						if (!tick) {
 							tick = getTickCount();
@@ -282,7 +287,7 @@ function Wakka() {
 
 					break;
 				}
-				
+
 				if (!seisClear) {
 					if (!this.followPath(this.seisCoords)) {
 						break;
@@ -294,7 +299,7 @@ function Wakka() {
 
 						break;
 					}
-					
+
 					if (this.checkBoss(getLocaleString(2852))) {
 						if (!tick) {
 							tick = getTickCount();

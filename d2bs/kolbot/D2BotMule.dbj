@@ -27,6 +27,7 @@ var MuleData = {
 			fullChars: [],
 			torchChars: []
 		};
+
 		string = JSON.stringify(obj);
 
 		FileTools.writeText(muleFilename, string);
@@ -206,6 +207,7 @@ function nextAccount() {
 	obj.character = "";
 	obj.charNum = 0;
 	obj.fullChars = [];
+	obj.torchChars = [];
 
 	MuleData.write(obj);
 
@@ -219,9 +221,9 @@ function nextChar() {
 		charNumbers = "abcdefghijklmnopqrstuvwxyz",
 		obj = MuleData.read();
 
-	if (getLocation() === 12) {
+	/*if (getLocation() === 12) {
 		obj.charNum = ControlAction.getCharacters().length;
-	}
+	}*/
 
 	// dirty
 	if (obj.charNum > 25) {
@@ -371,7 +373,7 @@ function main() {
 
 				if (status !== "begin") {
 					Controller.printToConsole("Nobody joined - stopping.");
-					Controller.stop();
+					Controller.stopProfile();
 				}
 
 				me.overhead("begin");
@@ -393,7 +395,7 @@ function main() {
 
 					MuleData.write(obj);
 					Controller.printToConsole("Done muling.");
-					Controller.stop();
+					Controller.stopProfile();
 
 					break;
 				// can't fit more items, get to next character or account
@@ -537,9 +539,9 @@ MainSwitch:
 				Controller.report(ReportType.CDKeyDisabled);
 
 				if (Controller.keyswap) {
-					Controller.restart();
+					Controller.restartProfile();
 				} else {
-					Controller.stop();
+					Controller.stopProfile();
 				}
 
 				break;
@@ -600,9 +602,9 @@ MainSwitch:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;
@@ -693,7 +695,7 @@ MainSwitch:
 
 		if (Controller.keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -714,7 +716,7 @@ MainSwitch:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -740,6 +742,8 @@ MainSwitch:
 
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		ControlAction.click(6, 533, 469, 120, 20);

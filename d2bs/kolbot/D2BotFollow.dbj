@@ -40,6 +40,7 @@ include("automule.js");
 include("torchsystem.js");
 
 var i, j, difficulty, gameStart, ingame, muleTrigger, firstLogin, connectFail, chatActionsDone, torchTrigger, torchMuleTrigger,
+	gamePass = "",
 	gameName = "",
 	leader = "",
 	lastGameStatus = "ready",
@@ -147,11 +148,6 @@ function main() {
 		while (me.ingame) { // returns true before actually in game so we can't only use this check
 			if (me.gameReady) { // returns false when switching acts so we can't use while
 				if (!ingame) {
-					if (me.gamepassword.toLowerCase() !== gamePass.toLowerCase()) {
-						print("leaving game");
-						quit();
-					}
-
 					print("Updating Status");
 					//Controller.updateStatus("Game: " + me.gamename);
 
@@ -325,8 +321,11 @@ JoinLoop:
 			break;
 		}
 
+		var gameData;
+
+		print("Getting game data.");
 		for (i = 0; i < 5; i += 1) {
-			var gameData = GameDataCommunicator.getGameData(leader);
+			gameData = GameDataCommunicator.getGameData(leader);
 
 			if (gameData.nextGame !== "") {
 				break;
@@ -400,9 +399,9 @@ JoinLoop:
 
 				if (Controller.keyswap) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-					Controller.restart();
+					Controller.restartProfile();
 				} else {
-					Controller.stop();
+					Controller.stopProfile();
 				}
 
 				break;
@@ -456,7 +455,7 @@ JoinLoop:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;
@@ -483,7 +482,7 @@ JoinLoop:
 
 		if (Controller.keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
 			ControlAction.click(6, 335, 450, 128, 35);
@@ -504,7 +503,7 @@ JoinLoop:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
 		}
@@ -527,6 +526,8 @@ JoinLoop:
 	case 26: // Lobby - Game Name Exists
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		Controller.printToConsole("Game doesn't exist");
@@ -537,7 +538,7 @@ JoinLoop:
 			if (Controller.keyswap) {
 				Controller.report(ReportType.CDKeyFlagged);
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-				Controller.restart();
+				Controller.restartProfile();
 			}
 		} else {
 			locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location);
@@ -562,7 +563,7 @@ JoinLoop:
 		if (location !== undefined) {
 			Controller.printToConsole("Unhandled location " + location);
 			delay(500);
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;

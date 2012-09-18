@@ -19,7 +19,7 @@ function UserAddon() {
 			FileTools.copy("libs/config/" + classes[me.classid] + ".js", "libs/config/" + classes[me.classid] + "." + me.name + ".js");
 			Controller.printToConsole("libs/config/" + classes[me.classid] + "." + me.name + ".js has been created.");
 			Controller.printToConsole("Please configure your bot and start it again.");
-			Controller.stop();
+			Controller.stopProfile();
 
 			break;
 		}

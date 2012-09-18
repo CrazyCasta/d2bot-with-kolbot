@@ -205,6 +205,7 @@ MainSwitch:
 			if (muleTrigger || torchMuleTrigger) {
 				GameDataCommunicator.setIsUp("no");
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
+				GameDataCommunicator.setIsUp("yes");
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -283,6 +284,7 @@ MainSwitch:
 			if (muleTrigger || torchMuleTrigger) {
 				GameDataCommunicator.setIsUp("no");
 				AutoMule.outOfGameCheck(torchMuleTrigger ? 1 : 0);
+				GameDataCommunicator.setIsUp("yes");
 
 				muleTrigger = false;
 				// torchMuleTrigger is set to false elsewhere because it would trigger normal mule if set to false here
@@ -389,6 +391,7 @@ MainSwitch:
 		}
 
 		timeoutDelay("Make Game Delay", StarterConfig.CreateGameDelay * 1e3);
+		print("Creating Game: " + gameName + gameCount);
 		createGame(gameName + gameCount, gamePass, difficulty === "Hell" ? 2 : difficulty === "Nightmare" ? 1 : 0);
 		locationTimeout(5000, location);
 
@@ -450,9 +453,9 @@ MainSwitch:
 
 				if (Controller.keyswap) {
 					timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-					Controller.restart();
+					Controller.restartProfile();
 				} else {
-					Controller.stop();
+					Controller.stopProfile();
 				}
 
 				break;
@@ -514,9 +517,9 @@ MainSwitch:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Realm Down - Changing CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;
@@ -545,7 +548,7 @@ MainSwitch:
 
 		if (Controller.keyswap) {
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("CD-Key in use", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -566,7 +569,7 @@ MainSwitch:
 		if (Controller.keyswap) {
 			Controller.printToConsole("Invalid CD-Key");
 			timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-			Controller.restart();
+			Controller.restartProfile();
 		} else {
 			ControlAction.click(6, 335, 450, 128, 35);
 			timeoutDelay("Invalid CD-Key", StarterConfig.CDKeyInUseDelay * 6e4);
@@ -595,6 +598,8 @@ MainSwitch:
 
 		break;
 	case 27: // Gateway Select
+		ControlAction.click(6, 436, 538, 96, 32);
+
 		break;
 	case 28: // Lobby - Game Does Not Exist
 		Controller.printToConsole("Game doesn't exist");
@@ -605,7 +610,7 @@ MainSwitch:
 			if (Controller.keyswap) {
 				Controller.report(ReportType.CDKeyFlagged);
 				timeoutDelay("Key switch delay", StarterConfig.SwitchKeyDelay * 1000);
-				Controller.restart();
+				Controller.restartProfile();
 			}
 		} else {
 			locationTimeout(StarterConfig.GameDoesNotExistTimeout * 1e3, location);
@@ -625,7 +630,7 @@ MainSwitch:
 		if (location !== undefined) {
 			Controller.printToConsole("Unhandled location " + location);
 			delay(500);
-			Controller.restart();
+			Controller.restartProfile();
 		}
 
 		break;
