@@ -68,7 +68,7 @@ function updateCount() {
 	ControlAction.click(6, 264, 366, 272, 35);
 
 	try {
-		login(me.profile);
+		Controller.getProfile().login();
 	} catch (e) {
 
 	}
@@ -416,7 +416,7 @@ MainSwitch:
 		Controller.updateStatus("Logging In");
 
 		try {
-			login(me.profile);
+			Controller.getProfile().login();
 		} catch (e) {
 			print(e);
 		}
@@ -494,7 +494,7 @@ MainSwitch:
 		break;
 	case 12: // Character Select
 		try {
-			login(me.profile);
+			Controller.getProfile().login();
 		} catch (e2) {
 
 		}
