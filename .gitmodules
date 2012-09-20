@@ -1,0 +1,3 @@
+[submodule "d2bs/kolbot"]
+	path = d2bs/kolbot
+	url = https://github.com/CrazyCasta/kolbot
