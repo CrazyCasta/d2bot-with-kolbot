@@ -4,9 +4,11 @@
 *	@desc		handle out of game operations like creating characters/accounts, maintaining profile datafiles, d2bot# logging etc.
 */
 
-include("GameController.js")
+include("GameControllerAbstract.js")
 
-var Controller = new ThisGameController();
+var gcConstructor = getConstructor();
+
+var Controller = new gcConstructor();
 
 var Messages = {
 	JoinMeMsg: function (gameName, gameCount, gamePass, isUp) {

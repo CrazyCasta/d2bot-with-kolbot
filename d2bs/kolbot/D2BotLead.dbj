@@ -136,7 +136,7 @@ function main() {
 	GameDataCommunicator.setIsUp("no");
 	updateGameInfo();
 
-	if (Controller.error === "@error") {
+	if (Controller.error !== undefined && Controller.error === "@error") {
 		timeoutDelay("Crash Delay", StarterConfig.CrashDelay * 1e3);
 		Controller.report(ReportType.Run);
 	}

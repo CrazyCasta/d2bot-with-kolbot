@@ -4,69 +4,80 @@
 *	@desc		Base object for talking with the Game Controllers in general
 */
 
+function getConstructor() {
+	var obj = {constructor: undefined};
+
+	while (obj.constructor === undefined) {
+		scriptBroadcast("getGameCnt", obj);
+		delay(20);
+	}
+
+	return obj.constructor;
+}
+
 function GameController() {
 }
 
-GameController.prototype = {
-	// Profile data methods
 
-	// Returns an object with name, password, and difficulty properties
-	getGameInfo: function () {
-		throw new Error("Method not defined.");
-	},
-	// Returns the Profile (d2bs primitive) to login with.
-	getProfile: function () {
-		return new Profile();
-	},
+// Profile data methods
 
-	// Logging methods
+// Returns an object with name, password, and difficulty properties
+GameController.prototype.getGameInfo = function () {
+	throw new Error("Method not defined.");
+};
 
-	// console - the name of the console (for game controllers that support
-	// this).
-	printToConsole: function (msg, color, console) {
-	},
-	logItem: function (item, action) {
-	},
+// Returns the Profile (d2bs primitive) to login with.
+GameController.prototype.getProfile = function () {
+	return new Profile();
+};
 
-	// Status methods
-	updateStatus: function (msg, inGame, waitSecs) {
-	},
-	report: function (type) {
-	},
+// Logging methods
 
-	// Profile control methods
-	restartProfile: function (profile) {
-		throw new Error("Method not defined.");
-	},
-	stopProfile: function (profile) {
-		throw new Error("Method not defined.");
-	},
-	startProfile: function (profile) {
-		throw new Error("Method not defined.");
-	},
+// console - the name of the console (for game controllers that support
+// this).
+GameController.prototype.printToConsole = function (msg, color, console) {
+};
+GameController.prototype.logItem = function (item, action) {
+};
 
-	// Profile communication
+// Status methods
+GameController.prototype.updateStatus = function (msg, inGame, waitSecs) {
+};
+GameController.prototype.report = function (type) {
+};
 
-	// Message is an object w/ msg and id properties.
-	sendMessage: function (profile, message) {
-		throw new Error("Method not defined.");
-	},
-	sendMessageAll: function (message) {
-		throw new Error("Method not defined.");
-	},
-	// cb - function (message)
-	addMessageHandler: function (cb) {
-		throw new Error("Method not defined.");
-	},
-	removeMessageHandler: function (cb) {
-		throw new Error("Method not defined.");
-	},
+// Profile control methods
+GameController.prototype.restartProfile = function (profile) {
+	throw new Error("Method not defined.");
+};
+GameController.prototype.stopProfile = function (profile) {
+	throw new Error("Method not defined.");
+};
+GameController.prototype.startProfile = function (profile) {
+	throw new Error("Method not defined.");
+};
 
-	// SOJ related
-	updateSOJCount: function () {
-	},
-	diabloWalksTheEarth: function () {
-	}
+// Profile communication
+
+// Message is an object w/ msg and id properties.
+GameController.prototype.sendMessage = function (profile, message) {
+	throw new Error("Method not defined.");
+};
+GameController.prototype.sendMessageAll = function (message) {
+	throw new Error("Method not defined.");
+};
+// cb - function (message)
+GameController.prototype.addMessageHandler = function (cb) {
+	throw new Error("Method not defined.");
+};
+GameController.prototype.removeMessageHandler = function (cb) {
+	throw new Error("Method not defined.");
+};
+
+// SOJ related
+GameController.prototype.updateSOJCount = function () {
+};
+GameController.prototype.diabloWalksTheEarth = function () {
 };
 
 const ReportType = {
