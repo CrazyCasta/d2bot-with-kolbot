@@ -53,14 +53,11 @@ function profilerGenner(cmd, pt, acct, pw, chr, gw) {
 function OOGsGameController() {
 	this.messageHandlerCbs = [];
 
-	print("Constructing.");
-
 	addEventListener("copydata", function (_this) { return function (id, msg) {
 		var i;
 
 		switch (id) {
 			case OOGsMessageIds.Ping:
-				print("Got ping");
 				sendCopyData(null, hWnd, OOGsMessageIds.Pong, "");
 				break;
 		}
