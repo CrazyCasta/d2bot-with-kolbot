@@ -44,6 +44,13 @@ function profilerGenner(cmd, pt, acct, pw, chr, gw) {
 }
 
 function OOGsGameController() {
+	addEventListener("copydata", function (id, msg) {
+		switch (id) {
+			case OOGsMessageIds.Ping:
+				sendCopyData(null, hWnd, OOGsMessageIds.Pong, "");
+				break;
+		}
+	});
 }
 
 for (i in GameController.prototype) {
