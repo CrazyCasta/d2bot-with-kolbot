@@ -21,8 +21,15 @@ const OOGsMessageIds = {
 	FailedToJoin: 15,
 	GameDoesNotExist: 16,
 	GameList: 17,
-	Character:18,
+	Character: 18,
 	ProfilerStarted: 19
+};
+
+const KolbotMessageIds = {
+	GameData: 256,
+	Start: 257,
+	Stop: 258,
+	Restart: 259
 }
 
 function hWndSetter(cmd, hWndIn) {
@@ -44,18 +51,36 @@ function profilerGenner(cmd, pt, acct, pw, chr, gw) {
 }
 
 function OOGsGameController() {
-	addEventListener("copydata", function (id, msg) {
+	this.messageHandlerCbs = [];
+
+	print("Constructing.");
+
+	addEventListener("copydata", function (_this) { return function (id, msg) {
+		var i;
+
 		switch (id) {
 			case OOGsMessageIds.Ping:
+				print("Got ping");
 				sendCopyData(null, hWnd, OOGsMessageIds.Pong, "");
 				break;
 		}
-	});
+
+		if (id >= 512)
+		{
+			for (i = 0; i < _this.messageHandlerCbs.length; i += 1) {
+				_this.messageHandlerCbs[i]({id: id - 512, msg: msg});
+			}
+		}
+	}; }(this));
 }
 
 for (i in GameController.prototype) {
 	OOGsGameController.prototype[i] = GameController.prototype[i];
 }
+
+OOGsGameController.prototype._sendCopyData = function (id, msg) {
+	sendCopyData(null, hWnd, id, msg);
+};
 
 OOGsGameController.prototype.getGameInfo = function () {
 	var gameInfo = {name: "", password: "", description: "", difficulty: "",
@@ -89,7 +114,7 @@ OOGsGameController.prototype.getGameInfo = function () {
 		delay(10);
 	}
 
-	sendCopyData(null, hWnd, 256, "");
+	this._sendCopyData(256, "");
 
 	while (!gotInfo) {
 		delay(10);
@@ -108,8 +133,46 @@ OOGsGameController.prototype.getProfile = function () {
 	return profile;
 };
 
+OOGsGameController.prototype.restartProfile = function (profile) {
+	if (profile === undefined) {
+		profile = me.profile;
+	}
+
+	this._sendCopyData(KolbotMessageIds.Restart, profile);
+};
+
+OOGsGameController.prototype.stopProfile = function (profile) {
+	if (profile === undefined) {
+		profile = me.profile;
+	}
+
+	this._sendCopyData(KolbotMessageIds.Stop, profile);
+};
+
+OOGsGameController.prototype.startProfile = function (profile) {
+	this._sendCopyData(KolbotMessageIds.Start, profile);
+};
+
+OOGsGameController.prototype.sendMessage = function (profile, message) {
+	this._sendCopyData(message.id + 512, profile + "]" + message.msg);
+};
+
+OOGsGameController.prototype.sendMessageAll = function (message) {
+	this.sendMessage("*", message);
+};
+
 OOGsGameController.prototype.addMessageHandler = function (cb) {
-	print("FIX FIX FIX!!!");
+	this.messageHandlerCbs.push(cb);
+};
+
+OOGsGameController.prototype.removeMessageHandler = function (cb) {
+	var i;
+	for (i = 0; i < this.messageHandlerCbs.length; ++i) {
+		if (cb === this.messageHandlerCbs[i]) {
+			this.messageHandlerCbs.splice(i, 1);
+			break;
+		}
+	}
 };
 
 function gameCntGiver(cmd, obj) {
