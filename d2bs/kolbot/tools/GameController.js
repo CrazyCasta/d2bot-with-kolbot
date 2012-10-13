@@ -22,7 +22,10 @@ const OOGsMessageIds = {
 	GameDoesNotExist: 16,
 	GameList: 17,
 	Character: 18,
-	ProfilerStarted: 19
+	ProfilerStarted: 19,
+	Failure: 20,
+	UpdateStatus: 21,
+	Log: 22
 };
 
 const KolbotMessageIds = {
@@ -128,6 +131,45 @@ OOGsGameController.prototype.getProfile = function () {
 	}
 
 	return profile;
+};
+
+OOGsGameController.prototype.printToConsole = function (msg, color, console) {
+	var _msg;
+
+	const colorTable = {
+
+		9: "#FF0000"
+	};
+
+	if (color !== undefined) {
+		if (color[0] === "#") {
+			_msg = "" + color + ",";
+		} else {
+			_msg += colorTable[color] + ",";
+		}
+	} else {
+		_msg = "default,"
+	}
+
+	if (console !== undefined) {
+		_msg += console + ",";
+	} else {
+		_msg += "default,";
+	}
+
+	_msg += msg;
+
+	this._sendCopyData(OOGsMessageIds.Log, _msg);
+};
+
+OOGsGameController.prototype.updateStatus = function (msg, inGame, waitSecs) {
+	var _msg = msg;
+
+	if (waitSecs !== undefined) {
+		_msg += " - " + waitSecs;
+	}
+
+	this._sendCopyData(OOGsMessageIds.UpdateStatus, _msg);
 };
 
 OOGsGameController.prototype.restartProfile = function (profile) {
