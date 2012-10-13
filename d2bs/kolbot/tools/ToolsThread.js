@@ -295,14 +295,14 @@ function main() {
 			break;
 		case 0x11: // "%Param1 Stones of Jordan Sold to Merchants"
 			if (configCache.SoJWaitTime) {
-				Controller.printToConsole(param1 + " Stones of Jordan Sold to Merchants;7");
+				Controller.printToConsole(param1 + " Stones of Jordan Sold to Merchants", 7);
 				scriptBroadcast("soj");
 			}
 
 			break;
 		case 0x12: // "Diablo Walks the Earth"
 			if (configCache.StopOnDClone) {
-				Controller.printToConsole("Diablo Walks the Earth;7");
+				Controller.printToConsole("Diablo Walks the Earth", 7);
 				this.togglePause();
 				Town.goToTown();
 				showConsole();
@@ -349,7 +349,7 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					Controller.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + area.name + this.getNearestMonster() + ";9");
+					Controller.printToConsole("Life Chicken: " + me.hp + "/" + me.hpmax + " in " + area.name + this.getNearestMonster(), 9);
 					Controller.report(ReportType.Chicken);
 					quit();
 
@@ -371,7 +371,7 @@ function main() {
 						area = {name: "unknown"};
 					}
 
-					Controller.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + area.name + ";9");
+					Controller.printToConsole("Mana Chicken: " + me.mp + "/" + me.mpmax + " in " + area.name, 9);
 					Controller.report(ReportType.Chicken);
 					quit();
 
@@ -391,7 +391,7 @@ function main() {
 								area = {name: "unknown"};
 							}
 
-							Controller.printToConsole("Irom Golem Chicken in " + area.name + ";9");
+							Controller.printToConsole("Irom Golem Chicken in " + area.name, 9);
 							Controller.report(ReportType.Chicken);
 							quit();
 
@@ -411,7 +411,7 @@ function main() {
 								area = {name: "unknown"};
 							}
 
-							Controller.printToConsole("Merc Chicken in " + area.name + ";9");
+							Controller.printToConsole("Merc Chicken in " + area.name, 9);
 							Controller.report(ReportType.Chicken);
 							quit();
 
@@ -426,7 +426,7 @@ function main() {
 					}
 				}
 			} catch (e) {
-				Controller.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name + ";9");
+				Controller.printToConsole("Error in Tools Thread: #" + e.lineNumber + ": " + e.message + " Area: " + getArea().name, 9);
 				quit();
 
 				return;

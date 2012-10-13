@@ -136,9 +136,23 @@ OOGsGameController.prototype.getProfile = function () {
 OOGsGameController.prototype.printToConsole = function (msg, color, console) {
 	var _msg;
 
-	const colorTable = {
-
-		9: "#FF0000"
+	const colorTable = [
+		"#000000", // 0
+		"#000000", // 1
+		"#000000", // 2
+		"#000000", // 3
+		"#0000FF", // 4
+		"#008000", // 5
+		"#B8860B", // 6
+		"#8B4513", // 7
+		"#FF8C00", // 8
+		"#FF0000", // 9
+		"#808080", // 10
+		"#000000", // 11
+		"#000000", // 12
+		"#000000", // 13
+		"#000000", // 14
+		"#000000", // 15
 	};
 
 	if (color !== undefined) {
