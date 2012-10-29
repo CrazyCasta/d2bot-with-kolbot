@@ -153,13 +153,13 @@ OOGsGameController.prototype.printToConsole = function (msg, color, console) {
 		"#000000", // 13
 		"#000000", // 14
 		"#000000", // 15
-	};
+	];
 
 	if (color !== undefined) {
-		if (color[0] === "#") {
+		if (typeof(color) === "string" && color[0] === "#") {
 			_msg = "" + color + ",";
 		} else {
-			_msg += colorTable[color] + ",";
+			_msg = colorTable[Number(color)] + ",";
 		}
 	} else {
 		_msg = "default,"
